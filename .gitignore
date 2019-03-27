@@ -1,2 +1,4 @@
 weights/*
 *.weights
+data/images
+data/Annotation

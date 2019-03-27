@@ -16,7 +16,7 @@ def detect(
         img_size=416,
         conf_thres=0.3,
         nms_thres=0.45,
-        save_txt=False,
+        save_txt=True,
         save_images=True,
         webcam=False
 ):
@@ -24,10 +24,8 @@ def detect(
     if os.path.exists(output):
         shutil.rmtree(output)  # delete output folder
     os.makedirs(output)  # make new output folder
-
     # Initialize model
     model = Darknet(cfg, img_size)
-
     # Load weights
     if weights.endswith('.pt'):  # pytorch format
         if weights.endswith('yolov3.pt') and not os.path.exists(weights):
@@ -70,27 +68,24 @@ def detect(
         if len(pred) > 0:
             # Run NMS on predictions
             detections = non_max_suppression(pred.unsqueeze(0), conf_thres, nms_thres)[0]
-
             # Rescale boxes from 416 to true image size
             scale_coords(img_size, detections[:, :4], im0.shape).round()
-
             # Print results to screen
             unique_classes = detections[:, -1].cpu().unique()
             for c in unique_classes:
-                n = (detections[:, -1].cpu() == c).sum()
-                print('%g %ss' % (n, classes[int(c)]), end=', ')
-            print(detections[:, 4:6])
+                if c==16:
+                    n = (detections[:, -1].cpu() == c).sum()
+                    print('%g %ss' % (n, classes[int(c)]), end=', ')
             # Draw bounding boxes and labels of detections
             for x1, y1, x2, y2, conf, cls_conf, cls in detections:
-                if save_txt:  # Write to file
-                    with open(save_path + '.txt', 'a') as file:
-                        file.write('%g %g %g %g %g %g\n' %
-                                   (x1, y1, x2, y2, cls, cls_conf * conf))
-
-                # Add bbox to the image
-                label = '%s %.2f' % (classes[int(cls)], conf)
-                plot_one_box([x1, y1, x2, y2], im0, label=label, color=colors[int(cls)])
-
+                if cls == 16: #this is to save only dogs as text files
+                    if save_txt:  # Write to file
+                        with open(save_path[:-4] + '.txt', 'a') as file:
+                            file.write('%g %g %g %g %g %g\n' %
+                                    (x1, y1, x2, y2, cls, cls_conf * conf))
+                    # Add bbox to the image
+                    label = '%s %.2f' % (classes[int(cls)], conf)
+                    plot_one_box([x1, y1, x2, y2], im0, label=label, color=colors[int(cls)])
         dt = time.time() - t
         print('Done. (%.3fs)' % dt)
 
