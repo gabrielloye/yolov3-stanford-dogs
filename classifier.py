@@ -12,14 +12,11 @@ def load_model():
         nn.Linear(n_inputs, 1024),
         nn.ReLU(),
         nn.Dropout(0.4),
-        nn.Linear(1024, 512),
-        nn.ReLU(),
-        nn.Dropout(0.4),
-        nn.Linear(512, n_classes),
+        nn.Linear(1024, n_classes),
         nn.LogSoftmax(dim=1))
     weights = torch.load('weights/dog_inception.pt', map_location="cpu")
     model.load_state_dict(weights['state_dict'])
-    mode.idx_to_class = weights['idx_to_class']
+    model.idx_to_class = weights['idx_to_class']
     
     return model
     

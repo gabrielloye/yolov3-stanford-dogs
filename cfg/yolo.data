@@ -1,4 +1,4 @@
-classes=80
+classes=1
 train=data/img_locations.txt
 valid=data/img_locations.txt
 names=data/classes.names
